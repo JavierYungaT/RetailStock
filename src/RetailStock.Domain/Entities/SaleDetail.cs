@@ -24,9 +24,9 @@ public class SaleDetail
     internal SaleDetail(int productId, int quantity, decimal unitPrice)
     {
         if (quantity <= 0)
-            throw new DomainException("La cantidad vendida debe ser mayor que cero.");
+            throw new BusinessRuleException("La cantidad vendida debe ser mayor que cero.");
         if (unitPrice < 0)
-            throw new DomainException("El precio unitario no puede ser negativo.");
+            throw new BusinessRuleException("El precio unitario no puede ser negativo.");
 
         ProductId = productId;
         Quantity = quantity;

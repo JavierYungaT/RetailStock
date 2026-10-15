@@ -28,7 +28,7 @@ public class InventoryMovement
     private InventoryMovement(MovementType type, int productId, int? fromWarehouseId, int? toWarehouseId, int quantity, int userId)
     {
         if (quantity <= 0)
-            throw new DomainException("La cantidad del movimiento debe ser mayor que cero.");
+            throw new BusinessRuleException("La cantidad del movimiento debe ser mayor que cero.");
 
         Type = type;
         ProductId = productId;
@@ -49,7 +49,7 @@ public class InventoryMovement
     public static InventoryMovement CreateTransfer(int productId, int fromWarehouseId, int toWarehouseId, int quantity, int userId)
     {
         if (fromWarehouseId == toWarehouseId)
-            throw new DomainException("La bodega de origen y destino deben ser distintas.");
+            throw new BusinessRuleException("La bodega de origen y destino deben ser distintas.");
 
         return new(MovementType.Transfer, productId, fromWarehouseId, toWarehouseId, quantity, userId);
     }

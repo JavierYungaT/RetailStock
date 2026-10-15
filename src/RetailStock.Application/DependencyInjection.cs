@@ -1,5 +1,7 @@
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using RetailStock.Application.Categories;
+using RetailStock.Application.Products;
+using RetailStock.Application.Warehouses;
 
 namespace RetailStock.Application;
 
@@ -12,11 +14,11 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        // Registra automáticamente todos los validadores (AbstractValidator<T>) de este ensamblado.
-        // Similar a como Spring detecta beans por escaneo de paquetes.
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
-
-        // Los servicios de casos de uso (ProductService, SaleService...) se registran aquí desde la Fase 3.
+        // Scoped: una instancia por petición HTTP, igual que el DbContext del que dependen (vía repositorios).
+        // Interfaz -> implementación: el controlador pide ICategoryService y recibe CategoryService.
+        services.AddScoped<ICategoryService, CategoryService>();
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IWarehouseService, WarehouseService>();
 
         return services;
     }

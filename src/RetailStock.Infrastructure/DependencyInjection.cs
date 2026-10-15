@@ -1,8 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RetailStock.Application.Categories;
 using RetailStock.Application.Common.Interfaces;
+using RetailStock.Application.Products;
+using RetailStock.Application.Warehouses;
 using RetailStock.Infrastructure.Persistence;
+using RetailStock.Infrastructure.Persistence.Repositories;
 
 namespace RetailStock.Infrastructure;
 
@@ -34,6 +38,15 @@ public static class DependencyInjection
                 // Reintenta ante errores transitorios de red/BD (útil con Docker y en la nube)
                 sql.EnableRetryOnFailure(maxRetryCount: 3);
             }));
+
+        // IUnitOfWork resuelve al MISMO AppDbContext de la petición que usan los repositorios;
+        // así SaveChanges confirma todo lo que los repositorios agregaron/modificaron.
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<AppDbContext>());
+
+        // Repositorios: Scoped porque dependen del DbContext (Scoped)
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
 
         // Fase 4: generador JWT · Fase 6: repositorios Dapper · Fase 7: cliente SAP (HttpClient tipado)
 

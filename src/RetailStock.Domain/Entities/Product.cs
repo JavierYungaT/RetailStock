@@ -23,15 +23,18 @@ public class Product
 
     public Product(string code, string name, int categoryId, decimal price)
     {
-        Code = code.Trim().ToUpperInvariant();
+        Code = NormalizeCode(code);
         IsActive = true;
         Update(name, categoryId, price);
     }
 
+    /// <summary>Formato canónico del código (" abr-001 " -> "ABR-001"); se usa también para buscar duplicados.</summary>
+    public static string NormalizeCode(string code) => code.Trim().ToUpperInvariant();
+
     public void Update(string name, int categoryId, decimal price)
     {
         if (price < 0)
-            throw new DomainException("El precio no puede ser negativo.");
+            throw new BusinessRuleException("El precio no puede ser negativo.");
 
         Name = name.Trim();
         CategoryId = categoryId;

@@ -1,7 +1,7 @@
 namespace RetailStock.Domain.Exceptions;
 
-/// <summary>Regla de negocio: no se puede vender ni egresar más stock del disponible.</summary>
-public sealed class InsufficientStockException : DomainException
+/// <summary>Regla de negocio: no se puede vender ni egresar más stock del disponible -> HTTP 409.</summary>
+public sealed class InsufficientStockException : ConflictException
 {
     public int ProductId { get; }
     public int WarehouseId { get; }

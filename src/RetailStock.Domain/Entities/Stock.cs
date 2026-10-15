@@ -25,7 +25,7 @@ public class Stock
     public Stock(int productId, int warehouseId, int quantity = 0)
     {
         if (quantity < 0)
-            throw new DomainException("La cantidad inicial no puede ser negativa.");
+            throw new BusinessRuleException("La cantidad inicial no puede ser negativa.");
 
         ProductId = productId;
         WarehouseId = warehouseId;
@@ -50,6 +50,6 @@ public class Stock
     private static void EnsurePositive(int quantity)
     {
         if (quantity <= 0)
-            throw new DomainException("La cantidad debe ser mayor que cero.");
+            throw new BusinessRuleException("La cantidad debe ser mayor que cero.");
     }
 }

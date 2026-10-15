@@ -1,11 +1,11 @@
 namespace RetailStock.Domain.Exceptions;
 
 /// <summary>
-/// Excepción base para violaciones de reglas de negocio.
-/// En la Fase 3 el middleware global la traduce a una respuesta HTTP (409 Conflict).
-/// Equivalente en Spring: una RuntimeException propia manejada en un @ControllerAdvice.
+/// Base abstracta de todas las excepciones de negocio. Cada subclase representa un tipo de error
+/// que el middleware global traduce a un código HTTP (sin que el dominio sepa nada de HTTP).
+/// Equivalente en Spring: RuntimeExceptions propias manejadas por un @ControllerAdvice.
 /// </summary>
-public class DomainException : Exception
+public abstract class DomainException : Exception
 {
-    public DomainException(string message) : base(message) { }
+    protected DomainException(string message) : base(message) { }
 }
