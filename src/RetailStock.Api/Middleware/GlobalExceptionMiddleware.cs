@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using RetailStock.Application.Common.Exceptions;
+using RetailStock.Application.Sap;
 using RetailStock.Domain.Exceptions;
 
 namespace RetailStock.Api.Middleware;
@@ -13,6 +14,7 @@ namespace RetailStock.Api.Middleware;
 ///   NotFoundException      -> 404 Not Found
 ///   BusinessRuleException  -> 400 Bad Request
 ///   ConflictException      -> 409 Conflict (incluye InsufficientStockException)
+///   SapIntegrationException -> 502 Bad Gateway (falló el sistema externo, no nuestra API)
 ///   cualquier otra         -> 500 Internal Server Error (sin filtrar detalles internos fuera de Development)
 /// </summary>
 public sealed class GlobalExceptionMiddleware
@@ -54,11 +56,12 @@ public sealed class GlobalExceptionMiddleware
             NotFoundException => (StatusCodes.Status404NotFound, "Recurso no encontrado"),
             BusinessRuleException => (StatusCodes.Status400BadRequest, "Regla de negocio violada"),
             ConflictException => (StatusCodes.Status409Conflict, "Conflicto con el estado actual"),
+            SapIntegrationException => (StatusCodes.Status502BadGateway, "Error en la integración con SAP"),
             _ => (StatusCodes.Status500InternalServerError, "Error interno del servidor")
         };
 
         // Logging estructurado: {Placeholders} se guardan como campos, no solo texto (como MDC/SLF4J con parámetros)
-        if (status == StatusCodes.Status500InternalServerError)
+        if (status >= StatusCodes.Status500InternalServerError)
             _logger.LogError(exception, "Error no controlado en {Method} {Path}", context.Request.Method, context.Request.Path);
         else
             _logger.LogWarning("{ExceptionType} en {Method} {Path}: {Message}",

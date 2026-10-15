@@ -265,6 +265,9 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
+                    b.Property<int?>("SapDocEntry")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Subtotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -296,6 +299,10 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Number")
                         .IsUnique();
+
+                    b.HasIndex("SyncedToSap")
+                        .HasDatabaseName("IX_Sales_PendingSap")
+                        .HasFilter("[SyncedToSap] = 0");
 
                     b.HasIndex("UserId");
 

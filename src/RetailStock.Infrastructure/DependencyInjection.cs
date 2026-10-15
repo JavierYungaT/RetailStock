@@ -10,9 +10,11 @@ using RetailStock.Application.Reports;
 using RetailStock.Application.Sales;
 using RetailStock.Application.Warehouses;
 using RetailStock.Infrastructure.Authentication;
+using RetailStock.Infrastructure.Common;
 using RetailStock.Infrastructure.Persistence;
 using RetailStock.Infrastructure.Persistence.Repositories;
 using RetailStock.Infrastructure.Reports;
+using RetailStock.Infrastructure.Sap;
 
 namespace RetailStock.Infrastructure;
 
@@ -72,15 +74,19 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
 
-        // ---- Reportes con Dapper ----
-        services.AddSingleton(new SqlConnectionFactory(connectionString));
-        services.AddOptions<ReportSettings>()
-            .Bind(configuration.GetSection(ReportSettings.SectionName))
+        // ---- Datos del negocio (zona horaria) ----
+        services.AddOptions<BusinessSettings>()
+            .Bind(configuration.GetSection(BusinessSettings.SectionName))
             .ValidateDataAnnotations()
             .ValidateOnStart();
+        services.AddSingleton<IBusinessClock, BusinessClock>();
+
+        // ---- Reportes con Dapper ----
+        services.AddSingleton(new SqlConnectionFactory(connectionString));
         services.AddScoped<IReportRepository, ReportRepository>();
 
-        // Fase 7: cliente SAP (HttpClient tipado)
+        // ---- Integración con SAP Business One (mock o cliente HTTP real según Sap:UseMock) ----
+        services.AddSapIntegration(configuration);
 
         return services;
     }

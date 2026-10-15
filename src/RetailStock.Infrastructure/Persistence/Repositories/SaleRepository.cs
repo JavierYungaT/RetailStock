@@ -35,6 +35,7 @@ internal sealed class SaleRepository : ISaleRepository
                 s.Tax,
                 s.Total,
                 s.SyncedToSap,
+                s.SapDocEntry,
                 // Colección anidada: EF la resuelve con un LEFT JOIN a SaleDetails + JOIN a Products
                 s.Details
                     .OrderBy(d => d.Id)
@@ -82,6 +83,18 @@ internal sealed class SaleRepository : ISaleRepository
                 s.SyncedToSap))
             .ToPagedResultAsync(query.Page, query.PageSize, cancellationToken);
     }
+
+    public async Task<IReadOnlyList<Sale>> GetPendingSapSyncAsync(int batchSize, CancellationToken cancellationToken = default)
+        => await _context.Sales
+            .Where(s => !s.SyncedToSap) // usa el índice filtrado IX_Sales_PendingSap
+            .OrderBy(s => s.Id)         // las más antiguas primero
+            .Take(batchSize)
+            // Include + ThenInclude: detalle y producto (ItemCode) en la misma consulta, sin N+1.
+            // AsSplitQuery: 2 consultas (ventas, detalles+productos) en vez de un JOIN que repite la cabecera por cada línea.
+            .Include(s => s.Details)
+                .ThenInclude(d => d.Product)
+            .AsSplitQuery()
+            .ToListAsync(cancellationToken);
 
     public void Add(Sale sale) => _context.Sales.Add(sale);
 }

@@ -5,6 +5,7 @@ using RetailStock.Application.Inventory;
 using RetailStock.Application.Products;
 using RetailStock.Application.Reports;
 using RetailStock.Application.Sales;
+using RetailStock.Application.Sap;
 using RetailStock.Application.Warehouses;
 
 namespace RetailStock.Application;
@@ -27,6 +28,7 @@ public static class DependencyInjection
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<ISaleService, SaleService>();
         services.AddScoped<IReportService, ReportService>();
+        services.AddScoped<ISapSyncService, SapSyncService>();
 
         return services;
     }

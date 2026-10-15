@@ -20,6 +20,9 @@
                          (índice clustered) a buscar columnas que faltan. Caro con muchas filas.
    ===================================================================================== */
 SET NOCOUNT ON;
+-- sqlcmd arranca con QUOTED_IDENTIFIER OFF y SQL Server lo exige ON para modificar tablas con
+-- índices filtrados (Sales tiene IX_Sales_PendingSap). SSMS/VS Code y SqlClient ya lo traen en ON.
+SET QUOTED_IDENTIFIER ON;
 BEGIN TRANSACTION;
 
 -- 1) Datos de prueba: 100.000 ventas repartidas a lo largo de 2025 (una cada 5 minutos)

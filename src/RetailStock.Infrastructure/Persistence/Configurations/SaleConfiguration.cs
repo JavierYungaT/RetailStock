@@ -25,6 +25,12 @@ internal sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
 
         builder.Property(s => s.SyncedToSap).HasDefaultValue(false);
 
+        // Índice FILTRADO: solo contiene las ventas pendientes de enviar a SAP (WHERE SyncedToSap = 0).
+        // Es diminuto aunque la tabla tenga millones de ventas ya sincronizadas, y hace barata la consulta del sync.
+        builder.HasIndex(s => s.SyncedToSap)
+            .HasFilter("[SyncedToSap] = 0")
+            .HasDatabaseName("IX_Sales_PendingSap");
+
         // Índice "cubriente" para sp_SalesByDay y el listado por fechas:
         //  - Clave: Date -> permite Index Seek con WHERE Date >= @desde AND Date < @hasta.
         //  - INCLUDE (Total): la columna viaja en la hoja del índice, así SUM(Total) se resuelve

@@ -51,6 +51,7 @@ public sealed record SaleResponse(
     decimal Tax,
     decimal Total,
     bool SyncedToSap,
+    int? SapDocEntry,
     IReadOnlyList<SaleDetailResponse> Details);
 
 public sealed record SaleDetailResponse(

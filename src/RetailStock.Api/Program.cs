@@ -3,6 +3,7 @@
 // Tiene dos partes: (1) registrar servicios en el contenedor DI, (2) armar el pipeline HTTP (middlewares).
 
 using System.Text.Json.Serialization;
+using RetailStock.Api.BackgroundServices;
 using RetailStock.Api.Extensions;
 using RetailStock.Api.Middleware;
 using RetailStock.Api.Services;
@@ -31,6 +32,9 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 
 // JWT Bearer + autorización con política "autenticado por defecto"
 builder.Services.AddJwtAuthentication();
+
+// Sincronización periódica de ventas con SAP (se activa con Sap:BackgroundSync:Enabled)
+builder.Services.AddHostedService<SapSyncBackgroundService>();
 
 // Swagger / OpenAPI con botón Authorize (equivalente a springdoc-openapi)
 builder.Services.AddSwaggerWithJwt();

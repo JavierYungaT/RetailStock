@@ -23,6 +23,8 @@ public class Sale
     public int WarehouseId { get; private set; }
     public int UserId { get; private set; }
     public bool SyncedToSap { get; private set; }
+    /// <summary>DocEntry de la factura creada en SAP Business One (trazabilidad entre ambos sistemas).</summary>
+    public int? SapDocEntry { get; private set; }
 
     public Warehouse Warehouse { get; private set; } = null!;
     public User User { get; private set; } = null!;
@@ -50,7 +52,14 @@ public class Sale
         RecalculateTotals();
     }
 
-    public void MarkAsSyncedToSap() => SyncedToSap = true;
+    public void MarkAsSyncedToSap(int sapDocEntry)
+    {
+        if (SyncedToSap)
+            throw new BusinessRuleException($"La venta {Number} ya fue sincronizada con SAP.");
+
+        SyncedToSap = true;
+        SapDocEntry = sapDocEntry;
+    }
 
     private void RecalculateTotals()
     {

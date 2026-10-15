@@ -11,5 +11,11 @@ public interface ISaleRepository
 {
     Task<SaleResponse?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
     Task<PagedResult<SaleSummaryResponse>> GetPagedAsync(SaleQuery query, CancellationToken cancellationToken = default);
+    /// <summary>
+    /// Ventas con SyncedToSap = false (las más antiguas primero), con detalle y productos, CON tracking:
+    /// el sync las modifica (MarkAsSyncedToSap).
+    /// </summary>
+    Task<IReadOnlyList<Sale>> GetPendingSapSyncAsync(int batchSize, CancellationToken cancellationToken = default);
+
     void Add(Sale sale);
 }

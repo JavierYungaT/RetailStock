@@ -2,6 +2,7 @@ using System.Data;
 using Dapper;
 using Microsoft.Extensions.Options;
 using RetailStock.Application.Reports;
+using RetailStock.Infrastructure.Common;
 using RetailStock.Infrastructure.Persistence;
 
 namespace RetailStock.Infrastructure.Reports;
@@ -14,9 +15,9 @@ namespace RetailStock.Infrastructure.Reports;
 internal sealed class ReportRepository : IReportRepository
 {
     private readonly SqlConnectionFactory _connectionFactory;
-    private readonly ReportSettings _settings;
+    private readonly BusinessSettings _settings;
 
-    public ReportRepository(SqlConnectionFactory connectionFactory, IOptions<ReportSettings> settings)
+    public ReportRepository(SqlConnectionFactory connectionFactory, IOptions<BusinessSettings> settings)
     {
         _connectionFactory = connectionFactory;
         _settings = settings.Value;

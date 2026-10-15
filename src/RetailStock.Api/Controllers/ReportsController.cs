@@ -7,7 +7,7 @@ namespace RetailStock.Api.Controllers;
 
 /// <summary>
 /// Reportes gerenciales (solo Admin). Se ejecutan con Dapper sobre procedimientos almacenados.
-/// Las fechas son días locales del negocio (Reports:UtcOffsetMinutes).
+/// Las fechas son días locales del negocio (Business:UtcOffsetMinutes).
 /// </summary>
 [ApiController]
 [Authorize(Roles = nameof(UserRole.Admin))]
