@@ -1,0 +1,29 @@
+# docker-compose: por ahora solo levanta SQL Server 2022.
+# En la Fase 10 se agregan los servicios "api" y "frontend".
+# Equivalente en Spring Boot: el compose.yaml que usa spring-boot-docker-compose
+# o un Testcontainers manual para tener la BD local.
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: retailstock-sqlserver
+    # SQL Server solo publica imagen amd64: en Mac Apple Silicon corre emulado (Rosetta)
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-RetailStock_Dev123!}
+      MSSQL_PID: Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      # Volumen con nombre: los datos sobreviven a "docker compose down"
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      # sqlcmd viene en /opt/mssql-tools18; -C confía en el certificado autofirmado
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  sqlserver-data:

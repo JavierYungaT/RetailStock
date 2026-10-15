@@ -1,0 +1,17 @@
+<!--
+  Directory.Build.props: MSBuild lo aplica automáticamente a TODOS los .csproj
+  de esta carpeta y subcarpetas.
+  Equivalente en Spring Boot: el <parent> POM / bloque "allprojects" de Gradle
+  donde defines configuración común (versión de Java, encoding, etc.).
+-->
+<Project>
+  <PropertyGroup>
+    <!-- Habilita los "nullable reference types": el compilador avisa de posibles NullPointerException -->
+    <Nullable>enable</Nullable>
+    <!-- Usings globales implícitos (System, System.Linq, System.Threading.Tasks...) -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <!-- Un null mal manejado es un error de compilación, no solo un warning -->
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
