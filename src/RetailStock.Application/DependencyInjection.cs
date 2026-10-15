@@ -3,6 +3,7 @@ using RetailStock.Application.Auth;
 using RetailStock.Application.Categories;
 using RetailStock.Application.Inventory;
 using RetailStock.Application.Products;
+using RetailStock.Application.Reports;
 using RetailStock.Application.Sales;
 using RetailStock.Application.Warehouses;
 
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IInventoryService, InventoryService>();
         services.AddScoped<ISaleService, SaleService>();
+        services.AddScoped<IReportService, ReportService>();
 
         return services;
     }

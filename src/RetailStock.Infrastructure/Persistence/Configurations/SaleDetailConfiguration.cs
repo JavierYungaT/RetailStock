@@ -19,7 +19,13 @@ internal sealed class SaleDetailConfiguration : IEntityTypeConfiguration<SaleDet
             .HasForeignKey(d => d.ProductId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Índice para reportes de "productos más vendidos"
+        // Consultas por producto (historial de ventas de un producto)
         builder.HasIndex(d => d.ProductId);
+
+        // Índice de la FK SaleId (EF lo crea por convención) ampliado para sp_TopProducts:
+        // tras filtrar Sales por fecha, el JOIN busca los detalles por SaleId (Seek) y obtiene
+        // ProductId, Quantity y LineTotal de la hoja del índice sin tocar la tabla.
+        builder.HasIndex(d => d.SaleId)
+            .IncludeProperties(d => new { d.ProductId, d.Quantity, d.LineTotal });
     }
 }

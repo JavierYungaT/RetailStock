@@ -31,6 +31,10 @@ internal sealed class StockConfiguration : IEntityTypeConfiguration<Stock>
         // Índice para consultar "todo el stock de una bodega" (la PK ya cubre las búsquedas por ProductId)
         builder.HasIndex(s => s.WarehouseId);
 
+        // Para sp_LowStock (WHERE Quantity < @Threshold): Seek por rango sobre Quantity.
+        // Es cubriente sin INCLUDE: todo índice no clustered ya contiene la clave del clustered (ProductId, WarehouseId).
+        builder.HasIndex(s => s.Quantity);
+
         builder.HasData(SeedData.Stocks);
     }
 }

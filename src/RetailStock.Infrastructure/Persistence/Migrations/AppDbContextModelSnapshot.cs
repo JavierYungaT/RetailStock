@@ -292,6 +292,8 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Date");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Date"), new[] { "Total" });
+
                     b.HasIndex("Number")
                         .IsUnique();
 
@@ -333,6 +335,8 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("SaleId");
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("SaleId"), new[] { "ProductId", "Quantity", "LineTotal" });
+
                     b.ToTable("SaleDetails", null, t =>
                         {
                             t.HasCheckConstraint("CK_SaleDetails_Quantity", "[Quantity] > 0");
@@ -357,6 +361,8 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         .HasColumnType("rowversion");
 
                     b.HasKey("ProductId", "WarehouseId");
+
+                    b.HasIndex("Quantity");
 
                     b.HasIndex("WarehouseId");
 

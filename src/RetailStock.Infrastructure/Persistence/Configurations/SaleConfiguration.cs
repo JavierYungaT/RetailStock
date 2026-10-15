@@ -25,8 +25,13 @@ internal sealed class SaleConfiguration : IEntityTypeConfiguration<Sale>
 
         builder.Property(s => s.SyncedToSap).HasDefaultValue(false);
 
-        // Índice para el reporte de ventas por día (Fase 6)
-        builder.HasIndex(s => s.Date);
+        // Índice "cubriente" para sp_SalesByDay y el listado por fechas:
+        //  - Clave: Date -> permite Index Seek con WHERE Date >= @desde AND Date < @hasta.
+        //  - INCLUDE (Total): la columna viaja en la hoja del índice, así SUM(Total) se resuelve
+        //    sin ir a la tabla (sin Key Lookup por cada fila).
+        //  - Id (clave del índice clustered) se incluye implícitamente: sirve para el JOIN con SaleDetails.
+        builder.HasIndex(s => s.Date)
+            .IncludeProperties(s => s.Total);
 
         builder.HasOne(s => s.Warehouse)
             .WithMany()

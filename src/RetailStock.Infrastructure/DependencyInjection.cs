@@ -6,11 +6,13 @@ using RetailStock.Application.Categories;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Application.Inventory;
 using RetailStock.Application.Products;
+using RetailStock.Application.Reports;
 using RetailStock.Application.Sales;
 using RetailStock.Application.Warehouses;
 using RetailStock.Infrastructure.Authentication;
 using RetailStock.Infrastructure.Persistence;
 using RetailStock.Infrastructure.Persistence.Repositories;
+using RetailStock.Infrastructure.Reports;
 
 namespace RetailStock.Infrastructure;
 
@@ -70,7 +72,15 @@ public static class DependencyInjection
         services.AddSingleton<ITokenService, JwtTokenService>();
         services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
 
-        // Fase 6: repositorios Dapper · Fase 7: cliente SAP (HttpClient tipado)
+        // ---- Reportes con Dapper ----
+        services.AddSingleton(new SqlConnectionFactory(connectionString));
+        services.AddOptions<ReportSettings>()
+            .Bind(configuration.GetSection(ReportSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        services.AddScoped<IReportRepository, ReportRepository>();
+
+        // Fase 7: cliente SAP (HttpClient tipado)
 
         return services;
     }
