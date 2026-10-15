@@ -8,12 +8,12 @@ namespace RetailStock.Application.Products;
 public sealed record CreateProductRequest
 {
     [Required(ErrorMessage = "El código es obligatorio.")]
-    [StringLength(30, MinimumLength = 3)]
+    [StringLength(30, MinimumLength = 3, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     [RegularExpression("^[A-Za-z0-9-]+$", ErrorMessage = "El código solo admite letras, números y guiones.")]
     public string Code { get; init; } = string.Empty;
 
     [Required(ErrorMessage = "El nombre es obligatorio.")]
-    [StringLength(150, MinimumLength = 2)]
+    [StringLength(150, MinimumLength = 2, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     public string Name { get; init; } = string.Empty;
 
     [Range(1, int.MaxValue, ErrorMessage = "Debe indicar una categoría válida.")]
@@ -31,7 +31,7 @@ public sealed record CreateProductRequest
 public sealed record UpdateProductRequest
 {
     [Required(ErrorMessage = "El nombre es obligatorio.")]
-    [StringLength(150, MinimumLength = 2)]
+    [StringLength(150, MinimumLength = 2, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     public string Name { get; init; } = string.Empty;
 
     [Range(1, int.MaxValue, ErrorMessage = "Debe indicar una categoría válida.")]

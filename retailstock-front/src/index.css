@@ -1,0 +1,21 @@
+/* Tailwind v4: un solo import; la configuración vive en CSS (@theme), no en tailwind.config.js */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Color de marca (también es la serie del gráfico de ventas) */
+  --color-brand-50: #eef5fd;
+  --color-brand-100: #d6e7fa;
+  --color-brand-500: #2a78d6;
+  --color-brand-600: #1f63b8;
+  --color-brand-700: #1a5196;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}
+
+/* Números alineados en tablas y totales (montos que no "bailan") */
+.tabular {
+  font-variant-numeric: tabular-nums;
+}

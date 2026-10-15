@@ -23,6 +23,10 @@ cp .env.example .env
 docker compose up -d                                  # SQL Server en localhost:1433
 dotnet run --project src/RetailStock.Api --launch-profile http
 # Swagger: http://localhost:5080/swagger
+
+# En otra terminal: frontend
+cd retailstock-front && npm install && npm run dev
+# App: http://localhost:5173
 ```
 
 > README completo con diagrama de capas en la Fase 10.

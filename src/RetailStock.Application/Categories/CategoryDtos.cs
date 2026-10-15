@@ -9,14 +9,14 @@ namespace RetailStock.Application.Categories;
 public sealed record CreateCategoryRequest
 {
     [Required(ErrorMessage = "El nombre es obligatorio.")]
-    [StringLength(100, MinimumLength = 2)]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     public string Name { get; init; } = string.Empty;
 }
 
 public sealed record UpdateCategoryRequest
 {
     [Required(ErrorMessage = "El nombre es obligatorio.")]
-    [StringLength(100, MinimumLength = 2)]
+    [StringLength(100, MinimumLength = 2, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     public string Name { get; init; } = string.Empty;
 }
 

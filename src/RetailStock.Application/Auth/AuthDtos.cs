@@ -17,7 +17,7 @@ public sealed record RegisterRequest
 {
     [Required(ErrorMessage = "El email es obligatorio.")]
     [EmailAddress(ErrorMessage = "El email no tiene un formato válido.")]
-    [StringLength(256)]
+    [StringLength(256, ErrorMessage = "Máximo {1} caracteres.")]
     public string Email { get; init; } = string.Empty;
 
     [Required(ErrorMessage = "La contraseña es obligatoria.")]

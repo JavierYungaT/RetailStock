@@ -18,6 +18,6 @@ public record PaginationQuery
     public int PageSize { get; init; } = 10;
 
     /// <summary>Filtro opcional: el nombre contiene este texto (sin distinguir mayúsculas).</summary>
-    [StringLength(100)]
+    [StringLength(100, ErrorMessage = "Máximo {1} caracteres.")]
     public string? Name { get; init; }
 }

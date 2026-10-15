@@ -33,6 +33,17 @@ builder.Services.AddScoped<ICurrentUser, CurrentUser>();
 // JWT Bearer + autorización con política "autenticado por defecto"
 builder.Services.AddJwtAuthentication();
 
+// CORS: el navegador bloquea las llamadas de http://localhost:5173 (front) a http://localhost:5080 (API)
+// porque son ORÍGENES distintos (otro puerto), salvo que la API los autorice explícitamente.
+// Equivalente en Spring: un CorsConfigurationSource / @CrossOrigin(origins = "http://localhost:5173").
+const string FrontendCorsPolicy = "Frontend";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddPolicy(FrontendCorsPolicy, policy => policy
+    .WithOrigins(allowedOrigins) // nunca AllowAnyOrigin en producción
+    .AllowAnyHeader()            // incluye Authorization y Content-Type
+    .AllowAnyMethod()
+    .SetPreflightMaxAge(TimeSpan.FromMinutes(10)))); // el navegador cachea el preflight OPTIONS
+
 // Sincronización periódica de ventas con SAP (se activa con Sap:BackgroundSync:Enabled)
 builder.Services.AddHostedService<SapSyncBackgroundService>();
 
@@ -59,6 +70,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// CORS antes de la autenticación: el preflight OPTIONS no lleva token y debe responderse sin pedirlo,
+// y los 401/403 también necesitan los headers CORS para que el front pueda leerlos.
+app.UseCors(FrontendCorsPolicy);
 
 // ORDEN OBLIGATORIO: primero "¿quién eres?" (lee y valida el JWT -> HttpContext.User),
 // luego "¿qué puedes hacer?" (evalúa [Authorize], roles y políticas).

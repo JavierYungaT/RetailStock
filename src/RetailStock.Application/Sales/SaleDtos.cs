@@ -9,7 +9,7 @@ namespace RetailStock.Application.Sales;
 public sealed record CreateSaleRequest
 {
     [Required(ErrorMessage = "El nombre del cliente es obligatorio.")]
-    [StringLength(150, MinimumLength = 2)]
+    [StringLength(150, MinimumLength = 2, ErrorMessage = "Debe tener entre {2} y {1} caracteres.")]
     public string CustomerName { get; init; } = string.Empty;
 
     /// <summary>Cédula (10 dígitos) o RUC (13 dígitos). Consumidor final: 9999999999999.</summary>
