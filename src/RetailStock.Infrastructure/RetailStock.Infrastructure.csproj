@@ -25,4 +25,9 @@
     <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Los repositorios son internal; solo el proyecto de pruebas puede verlos (como package-private + tests en el mismo paquete en Java) -->
+    <InternalsVisibleTo Include="RetailStock.Tests" />
+  </ItemGroup>
+
 </Project>

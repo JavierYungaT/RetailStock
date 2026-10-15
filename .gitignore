@@ -490,3 +490,5 @@ $RECYCLE.BIN/
 node_modules/
 dist/
 .DS_Store
+# Reportes de cobertura (Fase 8)
+coverage-report/

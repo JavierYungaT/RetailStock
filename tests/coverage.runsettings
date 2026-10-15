@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Configuración de cobertura (coverlet). Se usa con la opción "settings" de dotnet test (ver README).
+  Equivalente en Java: la configuración del plugin de JaCoCo (excludes) en el pom.xml / build.gradle.
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Solo nuestro código; no el de las pruebas -->
+          <Include>[RetailStock.Domain]*,[RetailStock.Application]*,[RetailStock.Infrastructure]*,[RetailStock.Api]*</Include>
+          <!-- Migraciones: código generado por EF, no tiene sentido medirlo -->
+          <ExcludeByFile>**/Migrations/*.cs</ExcludeByFile>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <SkipAutoProps>true</SkipAutoProps>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
