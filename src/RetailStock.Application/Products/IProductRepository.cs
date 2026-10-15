@@ -11,6 +11,9 @@ public interface IProductRepository
 
     Task<PagedResult<Product>> GetPagedAsync(ProductQuery query, CancellationToken cancellationToken = default);
 
+    /// <summary>Varios productos en una sola consulta (WHERE Id IN (...)), sin tracking.</summary>
+    Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default);
+
     Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken = default);
 
     void Add(Product product);

@@ -4,7 +4,9 @@ using Microsoft.Extensions.DependencyInjection;
 using RetailStock.Application.Auth;
 using RetailStock.Application.Categories;
 using RetailStock.Application.Common.Interfaces;
+using RetailStock.Application.Inventory;
 using RetailStock.Application.Products;
+using RetailStock.Application.Sales;
 using RetailStock.Application.Warehouses;
 using RetailStock.Infrastructure.Authentication;
 using RetailStock.Infrastructure.Persistence;
@@ -50,6 +52,10 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IStockRepository, StockRepository>();
+        services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
+        services.AddScoped<ISaleRepository, SaleRepository>();
+        services.AddScoped<ISaleNumberGenerator, SaleNumberGenerator>();
 
         // ---- Autenticación ----
         // Options pattern: enlaza la sección "Jwt" a JwtSettings, valida sus DataAnnotations y falla AL ARRANCAR

@@ -45,6 +45,13 @@ internal sealed class ProductRepository : IProductRepository
             .ToPagedResultAsync(query.Page, query.PageSize, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<Product>> GetByIdsAsync(IReadOnlyCollection<int> ids, CancellationToken cancellationToken = default)
+        // Contains sobre una lista -> WHERE Id IN (...) en una sola consulta
+        => await _context.Products
+            .AsNoTracking()
+            .Where(p => ids.Contains(p.Id))
+            .ToListAsync(cancellationToken);
+
     public Task<bool> CodeExistsAsync(string code, CancellationToken cancellationToken = default)
         => _context.Products.AnyAsync(p => p.Code == code, cancellationToken);
 

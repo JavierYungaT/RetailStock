@@ -1,7 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
 using RetailStock.Application.Auth;
 using RetailStock.Application.Categories;
+using RetailStock.Application.Inventory;
 using RetailStock.Application.Products;
+using RetailStock.Application.Sales;
 using RetailStock.Application.Warehouses;
 
 namespace RetailStock.Application;
@@ -21,6 +23,8 @@ public static class DependencyInjection
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IInventoryService, InventoryService>();
+        services.AddScoped<ISaleService, SaleService>();
 
         return services;
     }

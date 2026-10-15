@@ -28,6 +28,9 @@ internal sealed class WarehouseRepository : IWarehouseRepository
             .ToPagedResultAsync(query.Page, query.PageSize, cancellationToken);
     }
 
+    public Task<bool> ExistsAsync(int id, CancellationToken cancellationToken = default)
+        => _context.Warehouses.AnyAsync(w => w.Id == id, cancellationToken);
+
     public Task<bool> NameExistsAsync(string name, int? excludeId = null, CancellationToken cancellationToken = default)
         => _context.Warehouses.AnyAsync(w => w.Name == name && w.Id != excludeId, cancellationToken);
 

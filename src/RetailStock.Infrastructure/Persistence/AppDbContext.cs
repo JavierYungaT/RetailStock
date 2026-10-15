@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Domain.Entities;
 using RetailStock.Domain.Exceptions;
+using RetailStock.Infrastructure.Persistence.Converters;
 
 namespace RetailStock.Infrastructure.Persistence;
 
@@ -32,11 +33,55 @@ public sealed class AppDbContext : DbContext, IUnitOfWork
     public DbSet<Sale> Sales => Set<Sale>();
     public DbSet<SaleDetail> SaleDetails => Set<SaleDetail>();
 
+    /// <summary>Convenciones globales: se aplican a todas las propiedades de un tipo (como un AttributeConverter con autoApply = true).</summary>
+    protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+    {
+        configurationBuilder.Properties<DateTime>().HaveConversion<UtcDateTimeConverter>();
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // Aplica todas las clases IEntityTypeConfiguration<T> de este ensamblado (carpeta Configurations).
         // Así el mapeo queda fuera de las entidades y separado por entidad (Single Responsibility).
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+
+        // Secuencia para los números de factura (FAC-000001, FAC-000002...)
+        modelBuilder.HasSequence<long>(SaleNumberGenerator.SequenceName)
+            .StartsAt(1)
+            .IncrementsBy(1);
+    }
+
+    /// <summary>
+    /// Transacción explícita compatible con EnableRetryOnFailure.
+    /// Con reintentos activados, EF exige que la transacción completa viva dentro de la "execution strategy":
+    /// si hay un error transitorio (p. ej. se corta la red), la estrategia vuelve a ejecutar TODO el bloque
+    /// desde BeginTransaction, no solo la última sentencia.
+    /// </summary>
+    public Task<T> ExecuteInTransactionAsync<T>(Func<CancellationToken, Task<T>> operation, CancellationToken cancellationToken = default)
+    {
+        var strategy = Database.CreateExecutionStrategy();
+
+        return strategy.ExecuteAsync(async () =>
+        {
+            // BEGIN TRANSACTION (nivel por defecto: READ COMMITTED)
+            await using var transaction = await Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                var result = await operation(cancellationToken);
+                await transaction.CommitAsync(cancellationToken); // COMMIT
+                return result;
+            }
+            catch
+            {
+                // ROLLBACK: deshace todo lo escrito en la BD dentro de la transacción.
+                // CancellationToken.None: el rollback debe ejecutarse aunque el cliente haya cancelado.
+                await transaction.RollbackAsync(CancellationToken.None);
+                // Descarta las entidades en memoria (stocks descontados, venta agregada) para que un
+                // reintento empiece limpio y no reenvíe cambios de un intento fallido.
+                ChangeTracker.Clear();
+                throw;
+            }
+        });
     }
 
     /// <summary>

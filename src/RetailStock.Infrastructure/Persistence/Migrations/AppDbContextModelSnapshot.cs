@@ -22,6 +22,8 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.HasSequence("SaleNumbers");
+
             modelBuilder.Entity("RetailStock.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
