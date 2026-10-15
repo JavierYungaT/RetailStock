@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using RetailStock.Application.Common.Exceptions;
 using RetailStock.Domain.Exceptions;
 
 namespace RetailStock.Api.Middleware;
@@ -8,6 +9,7 @@ namespace RetailStock.Api.Middleware;
 /// en respuestas ProblemDetails (RFC 7807, application/problem+json) con el código HTTP correcto.
 /// Equivalente en Spring: @RestControllerAdvice + @ExceptionHandler que devuelven ProblemDetail (Spring 6).
 ///
+///   InvalidCredentialsException -> 401 Unauthorized (login fallido)
 ///   NotFoundException      -> 404 Not Found
 ///   BusinessRuleException  -> 400 Bad Request
 ///   ConflictException      -> 409 Conflict (incluye InsufficientStockException)
@@ -48,6 +50,7 @@ public sealed class GlobalExceptionMiddleware
     {
         var (status, title) = exception switch
         {
+            InvalidCredentialsException => (StatusCodes.Status401Unauthorized, "Credenciales inválidas"),
             NotFoundException => (StatusCodes.Status404NotFound, "Recurso no encontrado"),
             BusinessRuleException => (StatusCodes.Status400BadRequest, "Regla de negocio violada"),
             ConflictException => (StatusCodes.Status409Conflict, "Conflicto con el estado actual"),

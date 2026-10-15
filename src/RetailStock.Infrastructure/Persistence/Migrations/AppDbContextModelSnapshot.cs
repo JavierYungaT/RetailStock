@@ -521,8 +521,22 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         {
                             Id = 1,
                             Email = "admin@retailstock.com",
-                            PasswordHash = "$2a$11$2VijrJstQcT869rj49LnmO8nYPgmIDxJtlATEhe8rNrqAWhAIChtW",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGvOOr8DSNVmYjdTL+xQvqbUCyQBkIF/ErRF+y7jIxX28ZYgaegGr3hYj/vpn6WGJA==",
                             Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Email = "bodega@retailstock.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAELbMoKWVpVn1S5usBUaqzR3GapPU3y+RMsJyFCuJijhvE7YA9ueA8Jex/9HPe3Iimg==",
+                            Role = "Warehouse"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Email = "caja@retailstock.com",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM7ZTdhpJzkQ7PjfpkzMJSlAWzqzTDCaaYQcVl2VjRG2xfeSDJGZlihTC4IhtlA1Mw==",
+                            Role = "Cashier"
                         });
                 });
 

@@ -1,10 +1,12 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RetailStock.Application.Auth;
 using RetailStock.Application.Categories;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Application.Products;
 using RetailStock.Application.Warehouses;
+using RetailStock.Infrastructure.Authentication;
 using RetailStock.Infrastructure.Persistence;
 using RetailStock.Infrastructure.Persistence.Repositories;
 
@@ -47,8 +49,22 @@ public static class DependencyInjection
         services.AddScoped<ICategoryRepository, CategoryRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
 
-        // Fase 4: generador JWT · Fase 6: repositorios Dapper · Fase 7: cliente SAP (HttpClient tipado)
+        // ---- Autenticación ----
+        // Options pattern: enlaza la sección "Jwt" a JwtSettings, valida sus DataAnnotations y falla AL ARRANCAR
+        // si falta la clave (mejor que descubrirlo en el primer login). Como @ConfigurationProperties + @Validated.
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection(JwtSettings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        services.AddSingleton(TimeProvider.System);
+        // Singleton: no guardan estado por petición y son thread-safe
+        services.AddSingleton<ITokenService, JwtTokenService>();
+        services.AddSingleton<IPasswordHasher, IdentityPasswordHasher>();
+
+        // Fase 6: repositorios Dapper · Fase 7: cliente SAP (HttpClient tipado)
 
         return services;
     }

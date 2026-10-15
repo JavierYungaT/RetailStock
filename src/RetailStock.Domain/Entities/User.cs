@@ -23,4 +23,7 @@ public class User
         PasswordHash = passwordHash;
         Role = role;
     }
+
+    /// <summary>Reemplaza el hash (p. ej. al migrar a un algoritmo/iteraciones más fuertes tras un login exitoso).</summary>
+    public void ChangePasswordHash(string passwordHash) => PasswordHash = passwordHash;
 }

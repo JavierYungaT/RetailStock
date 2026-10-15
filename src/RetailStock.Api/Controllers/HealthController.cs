@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStock.Application.Common.Dtos;
 using RetailStock.Application.Common.Interfaces;
@@ -10,6 +11,7 @@ namespace RetailStock.Api.Controllers;
 /// [Route("api/[controller]")] = @RequestMapping("/api/health") ("[controller]" toma el nombre sin el sufijo "Controller").
 /// </summary>
 [ApiController]
+[AllowAnonymous] // público: lo usan Docker/Kubernetes para saber si la API está viva
 [Route("api/[controller]")]
 public sealed class HealthController : ControllerBase
 {

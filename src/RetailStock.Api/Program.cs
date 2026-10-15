@@ -2,39 +2,38 @@
 // Equivalente en Spring Boot: la clase @SpringBootApplication con main() + las clases @Configuration.
 // Tiene dos partes: (1) registrar servicios en el contenedor DI, (2) armar el pipeline HTTP (middlewares).
 
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using RetailStock.Api.Extensions;
 using RetailStock.Api.Middleware;
+using RetailStock.Api.Services;
 using RetailStock.Application;
+using RetailStock.Application.Common.Interfaces;
 using RetailStock.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // ---------- 1) Servicios (contenedor de inyección de dependencias) ----------
 
-builder.Services.AddControllers(); // como @RestController + Jackson
+builder.Services.AddControllers() // como @RestController + Jackson
+    // Enums como texto en JSON ("Cashier" en vez de 2), como @JsonFormat / WRITE_ENUMS_USING_TO_STRING
+    .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-// Respuestas de error estándar RFC 7807 (ProblemDetails) también para 404/405 sin cuerpo, etc.
+// Respuestas de error estándar RFC 7807 (ProblemDetails) también para 401/403/404 sin cuerpo
 builder.Services.AddProblemDetails();
 
 // Cada capa registra lo suyo; Program.cs solo las compone
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-// Swagger / OpenAPI (equivalente a springdoc-openapi)
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "RetailStock API",
-        Version = "v1",
-        Description = "Sistema de inventario y ventas para retail"
-    });
-    // Muestra los comentarios /// de los controladores en la UI de Swagger
-    var xmlFile = Path.Combine(AppContext.BaseDirectory, $"{typeof(Program).Assembly.GetName().Name}.xml");
-    options.IncludeXmlComments(xmlFile);
-    // Fase 4: aquí se agrega la definición de seguridad Bearer (botón "Authorize")
-});
+// Usuario actual a partir de los claims del JWT (lo usan los servicios vía ICurrentUser)
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, CurrentUser>();
+
+// JWT Bearer + autorización con política "autenticado por defecto"
+builder.Services.AddJwtAuthentication();
+
+// Swagger / OpenAPI con botón Authorize (equivalente a springdoc-openapi)
+builder.Services.AddSwaggerWithJwt();
 
 var app = builder.Build();
 
@@ -42,17 +41,25 @@ var app = builder.Build();
 
 // PRIMERO: así su try/catch envuelve a todos los middlewares y controladores siguientes (equivale a @ControllerAdvice)
 app.UseMiddleware<GlobalExceptionMiddleware>();
-// Convierte respuestas vacías 4xx/5xx (p. ej. 404 de ruta inexistente) en ProblemDetails
+// Convierte respuestas vacías 4xx/5xx (404 de ruta inexistente, 401/403 de JwtBearer) en ProblemDetails
 app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options => options.DocumentTitle = "RetailStock API");
+    app.UseSwaggerUI(options =>
+    {
+        options.DocumentTitle = "RetailStock API";
+        options.EnablePersistAuthorization(); // recuerda el token al recargar la página de Swagger
+    });
 }
 
 app.UseHttpsRedirection();
-// Fase 4: app.UseAuthentication();
+
+// ORDEN OBLIGATORIO: primero "¿quién eres?" (lee y valida el JWT -> HttpContext.User),
+// luego "¿qué puedes hacer?" (evalúa [Authorize], roles y políticas).
+// Al revés, UseAuthorization vería siempre un usuario anónimo y respondería 401 a todo.
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

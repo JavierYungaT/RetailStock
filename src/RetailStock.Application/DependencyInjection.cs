@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using RetailStock.Application.Auth;
 using RetailStock.Application.Categories;
 using RetailStock.Application.Products;
 using RetailStock.Application.Warehouses;
@@ -19,6 +20,7 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
+        services.AddScoped<IAuthService, AuthService>();
 
         return services;
     }

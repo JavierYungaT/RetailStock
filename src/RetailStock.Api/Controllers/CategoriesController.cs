@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RetailStock.Application.Categories;
 using RetailStock.Application.Common.Dtos;
+using RetailStock.Domain.Enums;
 
 namespace RetailStock.Api.Controllers;
 
@@ -10,6 +12,7 @@ namespace RetailStock.Api.Controllers;
 /// los genera [ApiController] automáticamente (como @Valid + MethodArgumentNotValidException).
 /// </summary>
 [ApiController]
+[Authorize] // todos los endpoints exigen token; los GET quedan para cualquier rol autenticado
 [Route("api/[controller]")]
 [Produces("application/json")]
 public sealed class CategoriesController : ControllerBase
@@ -33,6 +36,7 @@ public sealed class CategoriesController : ControllerBase
         => Ok(await _categoryService.GetByIdAsync(id, cancellationToken));
 
     [HttpPost]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [ProducesResponseType<CategoryResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
@@ -45,6 +49,7 @@ public sealed class CategoriesController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [ProducesResponseType<CategoryResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
@@ -54,7 +59,9 @@ public sealed class CategoriesController : ControllerBase
 
     /// <summary>409 si la categoría tiene productos.</summary>
     [HttpDelete("{id:int}")]
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

@@ -14,12 +14,17 @@ namespace RetailStock.Infrastructure.Persistence.Seed;
 /// </summary>
 internal static class SeedData
 {
-    // Contraseña: Admin123!  (hash BCrypt precalculado, factor de costo 11). Cámbiala en producción.
-    private const string AdminPasswordHash = "$2a$11$2VijrJstQcT869rj49LnmO8nYPgmIDxJtlATEhe8rNrqAWhAIChtW";
+    // Hashes precalculados con PasswordHasher<User> de Identity (PBKDF2-HMACSHA512, 100.000 iteraciones).
+    // Contraseñas solo para desarrollo: Admin123! / Warehouse123! / Cashier123!
+    private const string AdminPasswordHash = "AQAAAAIAAYagAAAAEGvOOr8DSNVmYjdTL+xQvqbUCyQBkIF/ErRF+y7jIxX28ZYgaegGr3hYj/vpn6WGJA==";
+    private const string WarehousePasswordHash = "AQAAAAIAAYagAAAAELbMoKWVpVn1S5usBUaqzR3GapPU3y+RMsJyFCuJijhvE7YA9ueA8Jex/9HPe3Iimg==";
+    private const string CashierPasswordHash = "AQAAAAIAAYagAAAAEM7ZTdhpJzkQ7PjfpkzMJSlAWzqzTDCaaYQcVl2VjRG2xfeSDJGZlihTC4IhtlA1Mw==";
 
     public static readonly object[] Users =
     {
-        new { Id = 1, Email = "admin@retailstock.com", PasswordHash = AdminPasswordHash, Role = UserRole.Admin }
+        new { Id = 1, Email = "admin@retailstock.com", PasswordHash = AdminPasswordHash, Role = UserRole.Admin },
+        new { Id = 2, Email = "bodega@retailstock.com", PasswordHash = WarehousePasswordHash, Role = UserRole.Warehouse },
+        new { Id = 3, Email = "caja@retailstock.com", PasswordHash = CashierPasswordHash, Role = UserRole.Cashier }
     };
 
     public static readonly object[] Categories =
