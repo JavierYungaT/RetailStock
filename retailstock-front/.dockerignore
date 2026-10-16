@@ -1,0 +1,14 @@
+# Se instala dentro de la imagen con "npm ci"
+node_modules/
+dist/
+
+# Variables locales (la URL de la API llega como build arg)
+.env
+.env.*
+!.env.example
+
+Dockerfile
+.dockerignore
+*.md
+.vscode/
+.DS_Store

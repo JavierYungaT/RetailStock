@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <!-- Genera el XML de los comentarios /// para mostrarlos en Swagger; 1591 = "falta comentario XML" -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>10e92144-5ffd-4235-acee-f55bbd309053</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

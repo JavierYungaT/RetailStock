@@ -1,0 +1,30 @@
+# Contexto de build de la API (raíz del repo): solo lo necesario, nunca secretos.
+# Menos archivos = build más rápido y sin filtrar nada a la imagen.
+
+# Secretos y configuración local
+.env
+.env.*
+!.env.example
+**/appsettings.*.local.json
+
+# Artefactos de compilación (se generan dentro de la imagen)
+**/bin/
+**/obj/
+TestResults/
+coverage-report/
+
+# No forman parte de la imagen de la API
+.git/
+.github/
+.vs/
+.vscode/
+.idea/
+retailstock-front/
+tests/
+docs/
+database/
+*.md
+docker-compose*.yml
+**/Dockerfile*
+**/*.user
+.DS_Store

@@ -10,6 +10,7 @@ using RetailStock.Api.Services;
 using RetailStock.Application;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Infrastructure;
+using RetailStock.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,13 @@ builder.Services.AddSwaggerWithJwt();
 
 var app = builder.Build();
 
+// En Development la API crea/actualiza la base de datos al arrancar (docker compose up deja todo listo).
+// En otros entornos las migraciones se aplican como paso del despliegue, no al iniciar.
+if (app.Environment.IsDevelopment())
+{
+    await app.Services.ApplyMigrationsAsync();
+}
+
 // ---------- 2) Pipeline HTTP (el orden importa, como la cadena de filtros de Spring Security) ----------
 
 // PRIMERO: así su try/catch envuelve a todos los middlewares y controladores siguientes (equivale a @ControllerAdvice)
@@ -83,7 +91,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
 
 // Permite referenciar Program desde pruebas de integración (WebApplicationFactory<Program>)
 public partial class Program;

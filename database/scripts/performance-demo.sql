@@ -4,9 +4,9 @@
    Inserta 100.000 ventas de prueba DENTRO de una transacción, compara consultas y al final
    hace ROLLBACK: la base de datos queda exactamente como estaba.
 
-   Ejecutar (desde la raíz del repo):
-     docker exec -i retailstock-sqlserver /opt/mssql-tools18/bin/sqlcmd \
-       -S localhost -U sa -P 'RetailStock_Dev123!' -C -d RetailStockDb -W \
+   Ejecutar (desde la raíz del repo; la contraseña se toma de la variable del contenedor, no se escribe):
+     docker exec -i retailstock-sqlserver sh -c \
+       '/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "$MSSQL_SA_PASSWORD" -C -d RetailStockDb -W -w 400' \
        < database/scripts/performance-demo.sql
 
    O abrirlo en VS Code con la extensión "SQL Server (mssql)" y activar el plan de ejecución real.

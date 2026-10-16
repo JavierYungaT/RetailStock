@@ -22,9 +22,9 @@ internal static class SeedData
 
     public static readonly object[] Users =
     {
-        new { Id = 1, Email = "admin@retailstock.com", PasswordHash = AdminPasswordHash, Role = UserRole.Admin },
-        new { Id = 2, Email = "bodega@retailstock.com", PasswordHash = WarehousePasswordHash, Role = UserRole.Warehouse },
-        new { Id = 3, Email = "caja@retailstock.com", PasswordHash = CashierPasswordHash, Role = UserRole.Cashier }
+        new { Id = 1, Email = "admin@retailstock.com", PasswordHash = AdminPasswordHash, Role = UserRole.Admin, IsActive = true },
+        new { Id = 2, Email = "bodega@retailstock.com", PasswordHash = WarehousePasswordHash, Role = UserRole.Warehouse, IsActive = true },
+        new { Id = 3, Email = "caja@retailstock.com", PasswordHash = CashierPasswordHash, Role = UserRole.Cashier, IsActive = true }
     };
 
     public static readonly object[] Categories =

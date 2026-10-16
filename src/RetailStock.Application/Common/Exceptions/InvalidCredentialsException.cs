@@ -7,4 +7,6 @@ namespace RetailStock.Application.Common.Exceptions;
 public sealed class InvalidCredentialsException : Exception
 {
     public InvalidCredentialsException() : base("Email o contraseña incorrectos.") { }
+
+    public InvalidCredentialsException(string message) : base(message) { }
 }

@@ -1,7 +1,17 @@
-# docker-compose: por ahora solo levanta SQL Server 2022.
-# En la Fase 10 se agregan los servicios "api" y "frontend".
-# Equivalente en Spring Boot: el compose.yaml que usa spring-boot-docker-compose
-# o un Testcontainers manual para tener la BD local.
+# RetailStock - entorno completo: SQL Server + API + frontend.
+#   cp .env.example .env      (y cambia los valores)
+#   docker compose up -d --build
+#
+#   Front:   http://localhost:3000
+#   API:     http://localhost:5080/swagger
+#   SQL:     localhost,1433 (usuario sa)
+#
+# Los secretos llegan desde .env (ignorado por git). La sintaxis ${VAR:?mensaje} hace que compose
+# FALLE si la variable no existe, en vez de arrancar con un valor por defecto escondido en el repo.
+# Equivalente en Spring Boot: el compose.yaml de spring-boot-docker-compose + variables de entorno.
+
+name: retailstock
+
 services:
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -10,20 +20,55 @@ services:
     platform: linux/amd64
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-RetailStock_Dev123!}
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?Define SA_PASSWORD en .env (ver .env.example)}
       MSSQL_PID: Developer
     ports:
       - "1433:1433"
     volumes:
-      # Volumen con nombre: los datos sobreviven a "docker compose down"
-      - sqlserver-data:/var/opt/mssql
+      - sqlserver-data:/var/opt/mssql # los datos sobreviven a "docker compose down"
     healthcheck:
-      # sqlcmd viene en /opt/mssql-tools18; -C confía en el certificado autofirmado
       test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$${MSSQL_SA_PASSWORD}\" -C -Q 'SELECT 1' || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .                              # raíz: la API necesita Domain, Application e Infrastructure
+      dockerfile: src/RetailStock.Api/Dockerfile
+    image: retailstock-api
+    container_name: retailstock-api
+    depends_on:
+      sqlserver:
+        condition: service_healthy            # no arranca hasta que SQL Server responda (healthcheck)
+    environment:
+      # Development: Swagger habilitado y migraciones automáticas al iniciar
+      ASPNETCORE_ENVIRONMENT: Development
+      # "__" reemplaza a ":" en las claves de configuración (ConnectionStrings:DefaultConnection)
+      # "sqlserver" = nombre del servicio; Docker lo resuelve por DNS dentro de la red de compose
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=RetailStockDb;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True;Encrypt=True"
+      Jwt__Key: ${JWT_KEY:?Define JWT_KEY en .env (ver .env.example)}
+      Sap__UseMock: "true"
+      Cors__AllowedOrigins__0: http://localhost:3000
+      Cors__AllowedOrigins__1: http://localhost:5173
+    ports:
+      - "5080:8080"                           # host:contenedor
+    restart: unless-stopped
+
+  front:
+    build:
+      context: ./retailstock-front
+      args:
+        VITE_API_URL: /api                    # nginx reenvía /api al servicio "api"
+    image: retailstock-front
+    container_name: retailstock-front
+    depends_on:
+      - api
+    ports:
+      - "3000:8080"
+    restart: unless-stopped
 
 volumes:
   sqlserver-data:

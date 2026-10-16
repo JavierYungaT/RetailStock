@@ -42,6 +42,10 @@ public sealed class AuthService : IAuthService
         if (verification == PasswordVerification.Failed)
             throw new InvalidCredentialsException();
 
+        // Se informa DESPUÉS de verificar la contraseña: así no revela a un extraño qué cuentas existen
+        if (!user.IsActive)
+            throw new InvalidCredentialsException("Tu cuenta está desactivada. Contacta al administrador.");
+
         if (verification == PasswordVerification.SuccessRehashNeeded)
         {
             user.ChangePasswordHash(_passwordHasher.Hash(request.Password));
