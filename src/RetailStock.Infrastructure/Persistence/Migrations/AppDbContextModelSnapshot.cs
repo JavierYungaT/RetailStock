@@ -514,6 +514,9 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -536,6 +539,7 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         {
                             Id = 1,
                             Email = "admin@retailstock.com",
+                            IsActive = true,
                             PasswordHash = "AQAAAAIAAYagAAAAEGvOOr8DSNVmYjdTL+xQvqbUCyQBkIF/ErRF+y7jIxX28ZYgaegGr3hYj/vpn6WGJA==",
                             Role = "Admin"
                         },
@@ -543,6 +547,7 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         {
                             Id = 2,
                             Email = "bodega@retailstock.com",
+                            IsActive = true,
                             PasswordHash = "AQAAAAIAAYagAAAAELbMoKWVpVn1S5usBUaqzR3GapPU3y+RMsJyFCuJijhvE7YA9ueA8Jex/9HPe3Iimg==",
                             Role = "Warehouse"
                         },
@@ -550,6 +555,7 @@ namespace RetailStock.Infrastructure.Persistence.Migrations
                         {
                             Id = 3,
                             Email = "caja@retailstock.com",
+                            IsActive = true,
                             PasswordHash = "AQAAAAIAAYagAAAAEM7ZTdhpJzkQ7PjfpkzMJSlAWzqzTDCaaYQcVl2VjRG2xfeSDJGZlihTC4IhtlA1Mw==",
                             Role = "Cashier"
                         });

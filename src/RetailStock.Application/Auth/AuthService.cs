@@ -1,12 +1,11 @@
 using RetailStock.Application.Common.Exceptions;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Domain.Entities;
-using RetailStock.Domain.Exceptions;
 
 namespace RetailStock.Application.Auth;
 
 /// <summary>
-/// Login y registro. Equivalente en Spring Security: AuthenticationManager + UserDetailsService +
+/// Login (la gestión de usuarios vive en UserService). Equivalente en Spring Security: AuthenticationManager + UserDetailsService +
 /// PasswordEncoder, pero orquestados a mano (sin Identity completo).
 /// </summary>
 public sealed class AuthService : IAuthService
@@ -54,20 +53,6 @@ public sealed class AuthService : IAuthService
 
         var token = _tokenService.CreateToken(user);
         return new LoginResponse(token.Token, "Bearer", token.ExpiresAtUtc, user.Email, user.Role.ToString());
-    }
-
-    public async Task<UserResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
-    {
-        var email = NormalizeEmail(request.Email);
-        if (await _userRepository.EmailExistsAsync(email, cancellationToken))
-            throw new ConflictException($"Ya existe un usuario con el email '{email}'.");
-
-        // Role no es null aquí: [Required] ya lo validó en el controlador
-        var user = new User(email, _passwordHasher.Hash(request.Password), request.Role!.Value);
-        _userRepository.Add(user);
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return new UserResponse(user.Id, user.Email, user.Role.ToString());
     }
 
     private static string NormalizeEmail(string email) => email.Trim().ToLowerInvariant();

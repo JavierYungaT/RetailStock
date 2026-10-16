@@ -75,7 +75,7 @@ public sealed record SaleSummaryResponse(
 
 /// <summary>
 /// Filtros del listado: ?from=2026-10-01&amp;to=2026-10-15&amp;warehouseId=1&amp;name=juan
-/// Fechas inclusivas, en UTC. "name" filtra por nombre del cliente.
+/// Fechas inclusivas en días LOCALES del negocio (Business:UtcOffsetMinutes). "name" filtra por nombre del cliente.
 /// IValidatableObject = validación entre campos (como un @AssertTrue o un ConstraintValidator de clase).
 /// </summary>
 public sealed record SaleQuery : PaginationQuery, IValidatableObject

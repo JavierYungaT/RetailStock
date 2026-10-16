@@ -9,9 +9,23 @@ ofrece reportes gerenciales sobre SQL Server y sincroniza las facturas con **SAP
 Backend en **ASP.NET Core 8** con arquitectura limpia, frontend en **React + TypeScript**, todo
 orquestado con **Docker Compose** y validado en cada push con **GitHub Actions**.
 
-| Nueva venta (stock insuficiente → 409) | Dashboard del administrador |
+| Login | Dashboard del administrador |
 |---|---|
-| ![Nueva venta](docs/screenshots/sale-409.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| ![Login](docs/screenshots/login.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+| **Punto de venta** (stock en vivo, IVA 15%) | **Modo oscuro** |
+| ![Punto de venta](docs/screenshots/pos.png) | ![Dashboard oscuro](docs/screenshots/dashboard-dark.png) |
+
+<details>
+<summary>Más capturas: productos, movimientos, usuarios, comprobante y móvil</summary>
+
+| Productos | Nuevo movimiento |
+|---|---|
+| ![Productos](docs/screenshots/products.png) | ![Movimiento](docs/screenshots/movement.png) |
+| **Usuarios y roles** | **Comprobante** |
+| ![Usuarios](docs/screenshots/users.png) | ![Comprobante](docs/screenshots/receipt.png) |
+
+<img src="docs/screenshots/pos-mobile.png" alt="Punto de venta en móvil" width="300" />
+</details>
 
 ## Funcionalidades
 
@@ -23,7 +37,11 @@ orquestado con **Docker Compose** y validado en cada push con **GitHub Actions**
 - **Reportes** con Dapper y procedimientos almacenados: ventas por día, stock bajo y productos más vendidos.
 - **Integración con SAP B1 Service Layer**: cliente HTTP con sesión `B1SESSION`, reintentos (Polly),
   idempotencia por `NumAtCard`, mock para desarrollo y sincronización periódica en segundo plano.
-- **Frontend** responsive: login, productos, nueva venta y dashboard con gráfico de ventas.
+- **Frontend estilo CRM** (claro/oscuro, responsive): barra lateral por rol, paleta de comandos (⌘/Ctrl + K),
+  CRUD completos con paneles laterales, confirmaciones y notificaciones, punto de venta con stock en vivo,
+  historial con comprobante imprimible y dashboard con KPIs, tendencias y alertas de reposición.
+- **Gestión de usuarios**: alta, cambio de rol, activar/desactivar y restablecer contraseña, con reglas que
+  impiden quedarse sin administradores.
 
 ## Stack
 
@@ -34,7 +52,7 @@ orquestado con **Docker Compose** y validado en cada push con **GitHub Actions**
 | Seguridad | JWT Bearer, roles, `PasswordHasher` (PBKDF2), user-secrets, CORS |
 | Integración | `HttpClient` tipado, `Microsoft.Extensions.Http.Resilience` (Polly), `BackgroundService` |
 | Pruebas | xUnit, Moq, FluentAssertions, EF Core InMemory, coverlet + ReportGenerator |
-| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4, React Router, axios |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS v4 (tokens claro/oscuro), React Router, axios, lucide-react, sonner |
 | DevOps | Docker multi-stage (usuarios no root), Docker Compose, nginx, GitHub Actions |
 
 ## Arquitectura
@@ -234,13 +252,16 @@ Todos bajo `/api`. Errores en formato **ProblemDetails** (RFC 7807): 400 validac
 | Método | Ruta | Rol | Descripción |
 |---|---|---|---|
 | POST | `/auth/login` | público | Devuelve JWT, expiración y rol |
-| POST | `/auth/register` | Admin | Crea un usuario con rol |
+| POST | `/auth/register` | Admin | Crea un usuario con rol (igual que `POST /users`) |
 | GET | `/auth/me` | autenticado | Datos del usuario desde los claims |
+| GET · POST | `/users` | Admin | Usuarios paginados (filtros rol/estado) · crear |
+| PUT | `/users/{id}` · `/users/{id}/password` | Admin | Cambiar rol y estado · restablecer contraseña |
 | GET | `/products?page=&pageSize=&name=` | autenticado | Productos paginados con búsqueda |
 | POST · PUT · DELETE | `/products[/{id}]` | Admin | Crear, editar, desactivar (borrado lógico) |
 | GET · POST · PUT · DELETE | `/categories`, `/warehouses` | GET: autenticado · resto: Admin | CRUD de catálogo |
 | POST | `/inventory/entries` · `/exits` · `/transfers` | Warehouse, Admin | Movimientos de inventario |
-| GET | `/inventory/stock` · `/inventory/movements` | Warehouse, Admin | Existencias y kardex |
+| GET | `/inventory/stock` | Warehouse, Admin, Cashier | Existencias con precio y categoría (el POS las usa) |
+| GET | `/inventory/movements` | Warehouse, Admin | Kardex |
 | POST | `/sales` | Cashier, Admin | Registra una venta (transacción) |
 | GET | `/sales/{id}` · `/sales?from=&to=` | Cashier, Admin | Venta con detalle · listado por fechas |
 | GET | `/reports/sales-by-day` · `/low-stock` · `/top-products` | Admin | Reportes (Dapper + procedimientos almacenados) |

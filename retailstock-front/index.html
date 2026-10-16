@@ -5,6 +5,15 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RetailStock</title>
+    <meta name="color-scheme" content="light dark" />
+    <!-- Aplica el tema ANTES de pintar la página (evita el destello claro al recargar en modo oscuro) -->
+    <script>
+      try {
+        var t = localStorage.getItem('retailstock.theme') || 'system';
+        var dark = t === 'dark' || (t === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

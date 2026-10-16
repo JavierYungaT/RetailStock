@@ -36,7 +36,7 @@ public sealed record RegisterRequest
 public sealed record LoginResponse(string Token, string TokenType, DateTime ExpiresAtUtc, string Email, string Role);
 
 /// <summary>Usuario sin datos sensibles (nunca se devuelve el PasswordHash).</summary>
-public sealed record UserResponse(int Id, string Email, string Role);
+public sealed record UserResponse(int Id, string Email, string Role, bool IsActive);
 
 /// <summary>Datos del usuario autenticado, obtenidos de los claims del token (sin consultar la BD).</summary>
 public sealed record CurrentUserResponse(int Id, string Email, string Role, DateTime? TokenExpiresAtUtc);

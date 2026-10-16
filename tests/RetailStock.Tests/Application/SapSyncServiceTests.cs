@@ -2,10 +2,12 @@ using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Testing;
+using Microsoft.Extensions.Options;
 using Moq;
 using RetailStock.Application.Common.Interfaces;
 using RetailStock.Application.Sap;
 using RetailStock.Domain.Entities;
+using RetailStock.Infrastructure.Common;
 using RetailStock.Infrastructure.Persistence;
 using RetailStock.Infrastructure.Persistence.Repositories;
 
@@ -38,7 +40,7 @@ public class SapSyncServiceTests : IDisposable
         _sapClient.Setup(c => c.LoginAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new SapSession("session", "1000190", 30));
         _sapClient.Setup(c => c.FindInvoiceByReferenceAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync((SapInvoiceResult?)null);
 
-        _sut = new SapSyncService(new SaleRepository(_context), _sapClient.Object, _businessClock.Object, _context, _logger);
+        _sut = new SapSyncService(new SaleRepository(_context, Options.Create(new BusinessSettings { UtcOffsetMinutes = -300 })), _sapClient.Object, _businessClock.Object, _context, _logger);
     }
 
     [Fact]

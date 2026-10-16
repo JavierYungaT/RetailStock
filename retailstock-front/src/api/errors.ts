@@ -1,3 +1,4 @@
+import { toast } from 'sonner'
 import axios from 'axios'
 import type { ProblemDetails } from './types'
 
@@ -36,4 +37,9 @@ export function getFieldErrors(error: unknown): Record<string, string> {
   return Object.fromEntries(
     Object.entries(errors).map(([key, messages]) => [key.charAt(0).toLowerCase() + key.slice(1), messages[0]]),
   )
+}
+
+/** Muestra el error como notificación (toast). Se usa cuando no hay un campo específico al que asociarlo. */
+export function toastError(error: unknown, fallback?: string) {
+  toast.error(getErrorMessage(error, fallback))
 }

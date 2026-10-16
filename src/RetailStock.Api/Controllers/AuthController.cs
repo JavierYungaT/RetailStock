@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using RetailStock.Application.Auth;
 using RetailStock.Application.Common.Interfaces;
+using RetailStock.Application.Users;
 using RetailStock.Domain.Enums;
 
 namespace RetailStock.Api.Controllers;
@@ -17,11 +18,13 @@ namespace RetailStock.Api.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IUserService _userService;
     private readonly ICurrentUser _currentUser;
 
-    public AuthController(IAuthService authService, ICurrentUser currentUser)
+    public AuthController(IAuthService authService, IUserService userService, ICurrentUser currentUser)
     {
         _authService = authService;
+        _userService = userService;
         _currentUser = currentUser;
     }
 
@@ -37,7 +40,7 @@ public sealed class AuthController : ControllerBase
     public async Task<ActionResult<LoginResponse>> Login(LoginRequest request, CancellationToken cancellationToken)
         => Ok(await _authService.LoginAsync(request, cancellationToken));
 
-    /// <summary>Registra un usuario con rol Admin, Warehouse o Cashier. Solo Admin.</summary>
+    /// <summary>Registra un usuario con rol Admin, Warehouse o Cashier. Solo Admin (equivale a POST /api/users).</summary>
     [HttpPost("register")]
     [Authorize(Roles = nameof(UserRole.Admin))] // como @PreAuthorize("hasRole('ADMIN')")
     [ProducesResponseType<UserResponse>(StatusCodes.Status201Created)]
@@ -47,7 +50,7 @@ public sealed class AuthController : ControllerBase
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<UserResponse>> Register(RegisterRequest request, CancellationToken cancellationToken)
     {
-        var user = await _authService.RegisterAsync(request, cancellationToken);
+        var user = await _userService.CreateAsync(request, cancellationToken);
         // 201 sin header Location: aún no existe un endpoint GET /api/users/{id}
         return StatusCode(StatusCodes.Status201Created, user);
     }

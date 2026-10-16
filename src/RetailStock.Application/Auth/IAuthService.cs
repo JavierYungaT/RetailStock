@@ -4,5 +4,4 @@ namespace RetailStock.Application.Auth;
 public interface IAuthService
 {
     Task<LoginResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
-    Task<UserResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
 }

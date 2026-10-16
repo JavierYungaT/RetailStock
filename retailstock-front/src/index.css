@@ -1,21 +1,123 @@
-/* Tailwind v4: un solo import; la configuración vive en CSS (@theme), no en tailwind.config.js */
+/* Tailwind v4: la configuración vive en CSS (@theme). */
 @import "tailwindcss";
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* Color de marca (también es la serie del gráfico de ventas) */
-  --color-brand-50: #eef5fd;
-  --color-brand-100: #d6e7fa;
-  --color-brand-500: #2a78d6;
-  --color-brand-600: #1f63b8;
-  --color-brand-700: #1a5196;
+/* Modo oscuro por clase (.dark en <html>), controlado por ThemeProvider */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Tokens semánticos: los componentes usan ROLES (bg-surface, text-fg-muted, border-border...) en vez de
+  colores fijos. Para el modo oscuro solo se redefinen las variables, no cada componente.
+*/
+:root {
+  color-scheme: light;
+  --app-bg: #f6f7f9;
+  --surface: #ffffff;
+  --surface-muted: #f3f4f6;
+  --surface-hover: #f5f6f8;
+  --border: #e5e7eb;
+  --border-strong: #d1d5db;
+  --fg: #0f172a;
+  --fg-muted: #64748b;
+  --fg-subtle: #94a3b8;
+  --primary: #4f46e5;
+  --primary-hover: #4338ca;
+  --primary-soft: #eef2ff;
+  --primary-soft-fg: #4338ca;
+  --ring: rgb(79 70 229 / 0.35);
+  /* Serie del gráfico (paleta validada, slot 1) */
+  --chart-1: #2a78d6;
+  --chart-grid: #eef0f3;
+  --sidebar: #0f1220;
+  --sidebar-fg: #c7cbe0;
+  --sidebar-muted: #7d84a6;
+  --sidebar-active: rgb(255 255 255 / 0.08);
+  --shadow-color: 15 23 42;
 }
 
-body {
-  @apply bg-slate-50 text-slate-900 antialiased;
+.dark {
+  color-scheme: dark;
+  --app-bg: #0b0d14;
+  --surface: #12141d;
+  --surface-muted: #181b26;
+  --surface-hover: #1b1e2a;
+  --border: #242836;
+  --border-strong: #343949;
+  --fg: #eef0f6;
+  --fg-muted: #9aa1b9;
+  --fg-subtle: #6b728c;
+  --primary: #6d6af5;
+  --primary-hover: #8280f7;
+  --primary-soft: rgb(109 106 245 / 0.14);
+  --primary-soft-fg: #b4b3ff;
+  --ring: rgb(109 106 245 / 0.45);
+  --chart-1: #3987e5;
+  --chart-grid: #1f2330;
+  --sidebar: #0a0c13;
+  --sidebar-fg: #c7cbe0;
+  --sidebar-muted: #6b728c;
+  --sidebar-active: rgb(255 255 255 / 0.06);
+  --shadow-color: 0 0 0;
 }
 
-/* Números alineados en tablas y totales (montos que no "bailan") */
-.tabular {
-  font-variant-numeric: tabular-nums;
+@theme inline {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-app: var(--app-bg);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-fg-muted: var(--fg-muted);
+  --color-fg-subtle: var(--fg-subtle);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-fg: var(--primary-soft-fg);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-grid: var(--chart-grid);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-muted: var(--sidebar-muted);
+  --color-sidebar-active: var(--sidebar-active);
+  --shadow-card: 0 1px 2px rgb(var(--shadow-color) / 0.04), 0 1px 3px rgb(var(--shadow-color) / 0.06);
+  --shadow-pop: 0 10px 30px -10px rgb(var(--shadow-color) / 0.25), 0 4px 10px -4px rgb(var(--shadow-color) / 0.1);
+  --animate-fade-in: fade-in 160ms ease-out;
+  --animate-slide-in-right: slide-in-right 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 160ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-shake: shake 360ms ease-in-out;
+}
+
+@keyframes fade-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slide-in-right { from { transform: translateX(24px); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes scale-in { from { transform: scale(0.97); opacity: 0 } to { transform: none; opacity: 1 } }
+@keyframes shake { 0%, 100% { transform: none } 20%, 60% { transform: translateX(-6px) } 40%, 80% { transform: translateX(6px) } }
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-app font-sans text-fg antialiased; }
+  ::selection { background: var(--primary-soft); }
+  /* <dialog> nativo: sin estilos del navegador */
+  dialog { color: inherit; }
+  dialog::backdrop { background: rgb(8 10 20 / 0.45); backdrop-filter: blur(2px); }
+}
+
+/* Números alineados en tablas y totales (los montos no "bailan") */
+.tabular { font-variant-numeric: tabular-nums; }
+
+/* Barras de desplazamiento discretas */
+.scrollbar-thin { scrollbar-width: thin; scrollbar-color: var(--border-strong) transparent; }
+
+/* Respeta "reducir movimiento" del sistema operativo */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+}
+
+/* Impresión del comprobante: solo se imprime .print-area */
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area { position: absolute; inset: 0; padding: 24px; color: #000; background: #fff; }
+  .no-print { display: none !important; }
 }

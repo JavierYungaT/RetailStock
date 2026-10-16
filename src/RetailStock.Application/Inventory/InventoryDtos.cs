@@ -64,6 +64,10 @@ public sealed record StockResponse(
     int ProductId,
     string ProductCode,
     string ProductName,
+    int CategoryId,
+    string CategoryName,
+    decimal Price,
+    bool IsActive,
     int WarehouseId,
     string WarehouseName,
     int Quantity);
@@ -76,6 +80,12 @@ public sealed record StockQuery : PaginationQuery
 
     [Range(1, int.MaxValue)]
     public int? ProductId { get; init; }
+
+    [Range(1, int.MaxValue)]
+    public int? CategoryId { get; init; }
+
+    /// <summary>true = oculta productos desactivados (el punto de venta solo muestra lo vendible).</summary>
+    public bool OnlyActive { get; init; }
 }
 
 /// <summary>Filtros del kardex de movimientos.</summary>

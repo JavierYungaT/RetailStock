@@ -4,7 +4,7 @@ import type { Role } from '../../api/types'
 export const homeByRole: Record<Role, string> = {
   Admin: '/dashboard',
   Cashier: '/sales/new',
-  Warehouse: '/products',
+  Warehouse: '/inventory/stock',
 }
 
 export const roleLabels: Record<Role, string> = {

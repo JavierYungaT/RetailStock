@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using RetailStock.Application.Common.Dtos;
 using RetailStock.Application.Sales;
 using RetailStock.Domain.Entities;
+using RetailStock.Infrastructure.Common;
 
 namespace RetailStock.Infrastructure.Persistence.Repositories;
 
@@ -14,8 +16,13 @@ namespace RetailStock.Infrastructure.Persistence.Repositories;
 internal sealed class SaleRepository : ISaleRepository
 {
     private readonly AppDbContext _context;
+    private readonly TimeSpan _businessOffset;
 
-    public SaleRepository(AppDbContext context) => _context = context;
+    public SaleRepository(AppDbContext context, IOptions<BusinessSettings> businessSettings)
+    {
+        _context = context;
+        _businessOffset = TimeSpan.FromMinutes(businessSettings.Value.UtcOffsetMinutes);
+    }
 
     public Task<SaleResponse?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         => _context.Sales
@@ -53,16 +60,17 @@ internal sealed class SaleRepository : ISaleRepository
     {
         var sales = _context.Sales.AsNoTracking();
 
-        // Rango de fechas inclusivo: [from 00:00, to+1 00:00). Comparar así (y no con .Date) permite usar IX_Sales_Date.
+        // Rango de días LOCALES del negocio, inclusivo: [from 00:00 local, to+1 00:00 local), convertido a UTC
+        // (las fechas se guardan en UTC). Comparar así, y no con .Date, permite usar IX_Sales_Date.
         if (query.From is not null)
         {
-            var from = query.From.Value.ToDateTime(TimeOnly.MinValue);
-            sales = sales.Where(s => s.Date >= from);
+            var fromUtc = DateTime.SpecifyKind(query.From.Value.ToDateTime(TimeOnly.MinValue) - _businessOffset, DateTimeKind.Utc);
+            sales = sales.Where(s => s.Date >= fromUtc);
         }
         if (query.To is not null)
         {
-            var toExclusive = query.To.Value.AddDays(1).ToDateTime(TimeOnly.MinValue);
-            sales = sales.Where(s => s.Date < toExclusive);
+            var toUtcExclusive = DateTime.SpecifyKind(query.To.Value.AddDays(1).ToDateTime(TimeOnly.MinValue) - _businessOffset, DateTimeKind.Utc);
+            sales = sales.Where(s => s.Date < toUtcExclusive);
         }
         if (query.WarehouseId is not null)
             sales = sales.Where(s => s.WarehouseId == query.WarehouseId);

@@ -29,6 +29,10 @@ internal sealed class StockRepository : IStockRepository
             stocks = stocks.Where(s => s.WarehouseId == query.WarehouseId);
         if (query.ProductId is not null)
             stocks = stocks.Where(s => s.ProductId == query.ProductId);
+        if (query.CategoryId is not null)
+            stocks = stocks.Where(s => s.Product.CategoryId == query.CategoryId);
+        if (query.OnlyActive)
+            stocks = stocks.Where(s => s.Product.IsActive);
         if (!string.IsNullOrWhiteSpace(query.Name))
         {
             var term = query.Name.Trim();
@@ -44,6 +48,10 @@ internal sealed class StockRepository : IStockRepository
                 s.ProductId,
                 s.Product.Code,
                 s.Product.Name,
+                s.Product.CategoryId,
+                s.Product.Category.Name,
+                s.Product.Price,
+                s.Product.IsActive,
                 s.WarehouseId,
                 s.Warehouse.Name,
                 s.Quantity))

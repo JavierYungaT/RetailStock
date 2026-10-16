@@ -40,7 +40,7 @@ public sealed class SalesController : ControllerBase
     public async Task<ActionResult<SaleResponse>> GetById(int id, CancellationToken cancellationToken)
         => Ok(await _saleService.GetByIdAsync(id, cancellationToken));
 
-    /// <summary>Listado paginado. Ej: ?from=2026-10-01&amp;to=2026-10-31&amp;warehouseId=1 (fechas en UTC, inclusivas).</summary>
+    /// <summary>Listado paginado. Ej: ?from=2026-10-01&amp;to=2026-10-31&amp;warehouseId=1 (días locales del negocio, inclusivos).</summary>
     [HttpGet]
     [ProducesResponseType<PagedResult<SaleSummaryResponse>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest)]
